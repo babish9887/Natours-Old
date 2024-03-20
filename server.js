@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const app = require('./app');
 
 process.on('uncaughtException', err => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -7,25 +7,23 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-dotenv.config({ path: './config.env' });
-const app = require('./app');
-
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const DB = 'mongodb://localhost:27017/natours';
+// const DB="mongodb+srv://babish9887:zSv5TDnxbCLfK56x@cluster0.mzljvwc.mongodb.net/natours?retryWrites=true&w=majority&appName=Cluster0"
 
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
   })
-  .then(() => console.log('DB connection successful!'));
+  .then(() => {
+    // console.log(conn.connections)
+    console.log('DB connection Successfull');
+  });
 
-const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
-  console.log(`App running on port ${port}...`);
+app.listen(3000, () => {
+  console.log('start listening...');
 });
 
 process.on('unhandledRejection', err => {
