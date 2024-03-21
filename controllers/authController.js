@@ -12,26 +12,24 @@ const signToken = id => {
   });
 };
 
-
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
-  const cookieOptions= {
-    expires: new Date(Date.now()+(90 *24*60*60*1000)),
+  const cookieOptions = {
+    expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
     // secure: false,
-    httpOnly: true,
+    httpOnly: true
   };
-  if(process.env.NODE_ENV === 'production') cookieOptions.secure =true;
-  res.cookie('jwt', token, cookieOptions)
-  user.password = undefined
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  res.cookie('jwt', token, cookieOptions);
+  user.password = undefined;
   res.status(statusCode).json({
-    status: "Success",
+    status: 'Success',
     token,
     data: {
       user: user
     }
-  })
-}
-
+  });
+};
 
 exports.signup = async (req, res) => {
   try {
@@ -44,7 +42,7 @@ exports.signup = async (req, res) => {
       role: req.body.role
     });
 
-      createSendToken(newUser, 201, res);
+    createSendToken(newUser, 201, res);
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -55,7 +53,7 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const { email : unsanitized, password } = req.body;
+    const { email: unsanitized, password } = req.body;
     const email = mongoSanitize(unsanitized);
     if (!email || !password) {
       return res.status(404).json({
@@ -207,7 +205,6 @@ exports.resetPassword = async (req, res, next) => {
     await user.save();
 
     createSendToken(user, 200, res);
-   
   } catch (err) {
     res.status(400).json({
       status: 'Fail',
@@ -221,30 +218,32 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.updatePassword = async (req, res) => {
   // Get user from collection
-  try{
-  const user = await User.findById(req.user.id).select('+password');
-  console.log(user);
-  console.log(req.body.passwordCurrent, user.password);
-  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+  try {
+    const user = await User.findById(req.user.id).select('+password');
+    console.log(user);
+    console.log(req.body.passwordCurrent, user.password);
+    if (
+      !(await user.correctPassword(req.body.passwordCurrent, user.password))
+    ) {
+      res.status(400).json({
+        status: 'Fail',
+        message: 'Your current password in wrong!!'
+      });
+    }
+
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    await user.save();
+    // check if posted current password is correct
+    createSendToken(user, 200, res);
+
+    // If so, update password
+
+    // Log user id, sent JWT
+  } catch (e) {
     res.status(400).json({
       status: 'Fail',
-      message: 'Your current password in wrong!!'
+      message: err.message
     });
-  } 
-
-  user.password =req.body.password;
-  user.passwordConfirm=req.body.passwordConfirm;
-  await user.save();
-  // check if posted current password is correct
-  createSendToken(user, 200, res);
-
-  // If so, update password
-
-  // Log user id, sent JWT
-} catch (e){
-  res.status(400).json({
-    status: 'Fail',
-    message: err.message
-  });
-}
+  }
 };

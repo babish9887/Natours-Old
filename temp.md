@@ -1,0 +1,1 @@
+🚀 Day 66 of #100DaysOfCode: Just learned Pug and integrated it into my project! Structured my code and built a neat tour overview page. Loving the efficiency and organization it brings. Excited for more with Pug! 💻✨

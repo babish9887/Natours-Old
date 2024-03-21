@@ -194,3 +194,26 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
       });
 
   });
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// doctype html
+// html 
+//     head 
+//         title Natours | #{tour}
+//         link(rel='stylesheet' href='css/style.css' )
+//         link(rel='shortcut icon' type='image/png' href='img/favicon.png')
+//     body 
+//         h1= tour
+//         h2= user.toUpperCase()
+//         // h1 The Park Camper
+
+//         - const x=9;
+//         h2= x*2
+
+//         p This is just some text!

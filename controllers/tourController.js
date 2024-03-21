@@ -12,7 +12,7 @@ exports.aliasTopTours = (req, res, next) => {
 
 exports.getAllTours = factory.getAll(Tour);
 
-exports.getTour=factory.getOne(Tour, { 'path': 'reviews'});
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 // exports.getTour=factory.getOne(Tour);
 
 // exports.getTour = async (req, res, next) => {
@@ -35,10 +35,9 @@ exports.getTour=factory.getOne(Tour, { 'path': 'reviews'});
 
 exports.createTour = factory.createOne(Tour);
 
-exports.updateTour = factory.updateOne(Tour)
+exports.updateTour = factory.updateOne(Tour);
 
 exports.deleteTour = factory.deleteOne(Tour);
-
 
 exports.getTourStats = async (req, res, next) => {
   const stats = await Tour.aggregate([
@@ -118,29 +117,28 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   });
 });
 
-
 //34.043375, -118.196365
 
+exports.getToursWithin = async (req, res) => {
+  try {
+    const { distance, latlng, unit } = req.params;
+    const [lat, lng] = latlng.split(',');
+    const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+    if (!lat || !lng) return res.status(400).json({ message: 'bad request' });
+    console.log(distance, lat, lng, unit);
 
-exports.getToursWithin =  async (req, res) => {
-  try{
-  const{distance, latlng, unit}=req.params;
-  const [lat, lng]=latlng.split(',');
-  const radius = unit === 'mi'? distance / 3963.2 : distance / 6378.1;
-  if(!lat || !lng)
-    return res.status(400).json({message: 'bad request'})
-  console.log(distance, lat, lng, unit);
+    const tours = await Tour.find({
+      startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
+    });
 
-  const tours=await Tour.find({startLocation: {$geoWithin: {$centerSphere: [[lng,lat], radius]}}})
-
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      data: tours
-    }
-  });
-  } catch(err){
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        data: tours
+      }
+    });
+  } catch (err) {
     res.status(404).json({
       status: 'fail',
       message: err.message
@@ -148,31 +146,29 @@ exports.getToursWithin =  async (req, res) => {
   }
 };
 
+exports.getDistances = async (req, res) => {
+  try {
+    const { latlng, unit } = req.params;
+    const [lat, lng] = latlng.split(',');
+    const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+    if (!lat || !lng) return res.status(400).json({ message: 'bad request' });
 
-
-exports.getDistances = async (req, res)=>{
-  try{
-    const{ latlng, unit}=req.params;
-    const [lat, lng]=latlng.split(',');
-    const multiplier = unit === 'mi'? 0.000621371: 0.001
-    if(!lat || !lng)
-      return res.status(400).json({message: 'bad request'})
-  
     // const tours=await Tour.find({startLocation: {$geoWithin: {$centerSphere: [[lng,lat], radius]}}})
-  
-    const distances=await Tour.aggregate([
+
+    const distances = await Tour.aggregate([
       {
         $geoNear: {
           near: {
             type: 'Point',
-            coordinates: [lng*1, lat*1]
+            coordinates: [lng * 1, lat * 1]
           },
           distanceField: 'distance',
           distanceMultiplier: multiplier
         }
-      },{
+      },
+      {
         $project: {
-          distance:1,
+          distance: 1,
           name: 1
         }
       }
@@ -183,12 +179,10 @@ exports.getDistances = async (req, res)=>{
         data: distances
       }
     });
-   
-    } catch(err){
-      res.status(404).json({
-        status: 'fail',
-        message: err.message
-      });
-    }
-
-}
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err.message
+    });
+  }
+};
