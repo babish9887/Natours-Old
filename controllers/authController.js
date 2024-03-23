@@ -74,6 +74,17 @@ exports.login = async (req, res, next) => {
   }
 };
 
+exports.logout = (req, res)=> {
+  res.cookie('jwt', '', { // setting cookie value to empty string
+    expires: new Date(0), // setting expiration date to past date
+    httpOnly: true
+  });
+  res.status(200).json({
+    status: 'Success'
+  });
+}
+
+
 const verifyAsync = util.promisify(jwt.verify);
 exports.protect = async (req, res, next) => {
   try {
@@ -83,7 +94,10 @@ exports.protect = async (req, res, next) => {
       req.headers.authorization.startsWith('Bearer')
     ) {
       token = req.headers.authorization.split(' ')[1];
+    } else if(req.cookies.jwt){
+      token = req.cookies.jwt;
     }
+    
     if (!token) {
       return res.status(401).json({ message: 'You are not logged in!' });
     }
@@ -108,6 +122,7 @@ exports.protect = async (req, res, next) => {
     //   status: 'nothing'
     // });
     req.user = freshUser;
+    res.locals.user=freshUser;
     next();
   } catch (err) {
     res.status(400).json({
@@ -116,6 +131,32 @@ exports.protect = async (req, res, next) => {
     });
   }
 };
+
+
+//only for render pages, no errir
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    if(req.cookies.jwt){
+      //   Verify token
+      const decoded = await verifyAsync(req.cookies.jwt, secret);
+      console.log(decoded);
+      
+    const freshUser = await User.findById(decoded.id);
+    if (!freshUser)
+      return next()
+
+    if (freshUser.changedPasswordAfter(decoded.iat))
+      return next();
+
+    res.locals.user= freshUser;
+    next();
+  }
+  next();
+  } catch (err) {
+    return (next);
+  }
+};
+
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
