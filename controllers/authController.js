@@ -5,7 +5,7 @@ const secret = 'babishisagoodboy';
 const sendEmail = require('./../utils/email');
 const crypto = require('crypto');
 const mongoSanitize = require('mongo-sanitize');
-
+const Email = require('./../utils/email')
 const signToken = id => {
   return jwt.sign({ id: id }, secret, {
     expiresIn: '3d'
@@ -41,11 +41,20 @@ exports.signup = async (req, res) => {
       passwordChangedAt: req.body.passwordChangedAt,
       role: req.body.role
     });
+    const url = 'http://localhost:3000/me';
+    // await new Email(newUser, url).sendWelcome()
+    await sendEmail({
+      firstName: newUser.name,
+      url,
+      subject: "Welcome to Natours Family",
+      email: newUser.email,
+      template:'welcome'
+     })
 
     createSendToken(newUser, 201, res);
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: 'fail from signp',
       message: err.message
     });
   }
@@ -104,7 +113,6 @@ exports.protect = async (req, res, next) => {
 
     //   Verify token
     const decoded = await verifyAsync(token, secret);
-    console.log(decoded);
 
     const freshUser = await User.findById(decoded.id);
     if (!freshUser)
@@ -139,7 +147,6 @@ exports.isLoggedIn = async (req, res, next) => {
     if(req.cookies.jwt){
       //   Verify token
       const decoded = await verifyAsync(req.cookies.jwt, secret);
-      console.log(decoded);
       
     const freshUser = await User.findById(decoded.id);
     if (!freshUser)
@@ -179,7 +186,6 @@ exports.forgotPassword = async (req, res) => {
     });
 
   const resetToken = user.createPasswordResetToken();
-  console.log('reset token: ', resetToken);
 
   await user.save({ validateBeforeSave: false });
 
@@ -187,17 +193,25 @@ exports.forgotPassword = async (req, res) => {
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot you password? submit a patch requirest with you new password to ${resetURL}.`;
+  const message = `Forgot you password? submit a patch requirest with you new password to ${resetURL}`;
 
   try {
-    console.log('inside sending mail');
-    console.log(message);
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: 'Your password reset Token',
+    //   message
+    // });
+    // console.log('after sending mail');
+    // await new Email(user, resetURL).sendPasswordReset();
     await sendEmail({
+      firstName: user.name,
+      url:resetURL,
+      subject: "Reset Your password",
       email: user.email,
-      subject: 'Your password reset Token',
-      message
-    });
-    console.log('after sending mail');
+      // template:'passwordReset'
+      text: message
+     })
+
 
     res.status(200).json({
       status: 'success',
@@ -261,8 +275,6 @@ exports.updatePassword = async (req, res) => {
   // Get user from collection
   try {
     const user = await User.findById(req.user.id).select('+password');
-    console.log(user);
-    console.log(req.body.passwordCurrent, user.password);
     if (
       !(await user.correctPassword(req.body.passwordCurrent, user.password))
     ) {

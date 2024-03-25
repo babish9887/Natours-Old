@@ -5,14 +5,32 @@ import {updateData} from './updateSettings';
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 
+const bookBtn = document.getElementById('book-tour');
+import { bookTour } from './stripe';
 
+
+
+if (bookBtn){
+console.log('book tour present')
+bookBtn.addEventListener('click', e => {
+    e.target.textContent = 'Processing...';
+    const { tourId } = e.target.dataset;
+    bookTour(tourId);
+});
+}
 
 if(userDataForm){
     userDataForm.addEventListener('submit', e=>{
         e.preventDefault();
-        const name=document.getElementById('name').value
-        const email=document.getElementById('email').value
-        updateData({name,email}, 'data')
+        const form = new FormData()
+        form.append('name',document.getElementById('name').value);
+        form.append('email',document.getElementById('email').value);
+
+        form.append('photo', document.getElementById('photo').files[0]);
+        console.log("The Form is", form)
+        // const name=document.getElementById('name').value
+        // const email=document.getElementById('email').value
+        updateData(form, 'data')
 
     })
 }
@@ -36,6 +54,8 @@ if(userPasswordForm){
 
     })
 }
+
+
 
 
 

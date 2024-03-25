@@ -1,30 +1,46 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config();
+const pug=require('pug')
+const { convert} = require('html-to-text'); // Import htmlToText properly
+
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASSWORD
+    },
+});
 
 const sendEmail = async options => {
-  // Create Transporter
-  const transporter = nodemailer.createTransport({
-    host: 'sandbox.smtp.mailtrap.io',
-    port: 2525,
-    auth: {
-      user: '7c07a1e2079008',
-      password: '33547f9663cbcf'
+//   const html = pug.renderFile(`${__dirname}/../views/email/${options.template}.pug`, {
+//     firstName: options.firstName,
+//     url: options.url,
+//     subject: options.subject,
+//   });
+//   const convertOptions = {
+//     wordwrap: 130,
+//     // ...
+//   };
+
+    const mailOptions = {
+        from: {
+            name: 'Babish',
+            address: 'babish9887@gmail.com'
+        },
+        to:  [`${options.email}`],
+        subject: options.subject,
+        // text: convert(html, convertOptions)
+        text: options.text
     }
-  });
-
-  // Define the email options
-  const mailOptions = {
-    // from: 'hello@jonas.io',
-    from: '"Jonas 👻" <hello@jonas.io>',
-    to: options.email,
-    subject: options.subject,
-    text: options.message
-  };
-
-  // Actually send the email
-   transporter.sendMail(mailOptions, function(err) {
-    if (err) console.log("Some Error",err.message);
-    else console.log('email sent successfully');
-  });
-};
-
+    try{
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent Successfully')
+    } catch (err){
+        console.error('Error sending email:', err);
+    }
+}
 module.exports = sendEmail;

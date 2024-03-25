@@ -73,9 +73,7 @@ exports.deleteOne =  Model => async (req, res, next) => {
 
 exports.getOne = (Model , pops)=> async (req, res) => {
   let query=Model.findById(req.params.id);
-  console.log(pops);
   if(pops) query = query.populate(pops);
-  console.log(req.params.id)
   const doc = await query
   // doc.findOne({ _id: req.params.id })
   if (!doc) {

@@ -1,6 +1,16 @@
+const bookBtn = document.getElementById('book-tour');
+import { bookTour } from './stripe';
 
 
-console.log('hello from the client side ');
+
+if (bookBtn)
+console.log('book tour present')
+bookBtn.addEventListener('click', e => {
+    e.target.textContent = 'Processing...';
+    const { tourId } = e.target.dataset;
+    bookTour(tourId);
+});
+
 
 const mapBox = document.getElementById('map');
 

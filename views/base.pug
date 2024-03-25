@@ -7,6 +7,8 @@ html
             link(rel='stylesheet' href='/css/style.css' )
             link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
             link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+            //- script(src="https://js.stripe.com/v3/")
+
     body 
         // HeADER
         include _header
@@ -17,8 +19,14 @@ html
         // FOOTER
         include _footer
         //- script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js')
-        script(src='/js/mapbox.js')
+        //- script(src='/js/mapbox.js')
         //- script(src='/js/login.js')
         script(src='/js/bundle.js')
+        script(src="https://js.stripe.com/v3/")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/hmac-sha256.min.js")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/enc-base64.min.js")
+
+
 
 

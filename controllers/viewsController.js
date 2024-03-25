@@ -1,5 +1,7 @@
 const Tour=require('../models/tourModel');
 const User=require('../models/userModel');
+const Booking= require('../models/bookingModel');
+const Review = require('../models/reviewModel')
 
 
 exports.getOverview = async (req, res) => {
@@ -65,6 +67,54 @@ exports.getOverview = async (req, res) => {
           message: e.message
         })    
       }
+  }
+
+  exports.getMyTours = async (req, res, next)=>{
+
+    try{
+    const bookings = await Booking.find({user: req.user.id})
+
+    const toursIds=bookings.map(el =>el.tour);
+
+    const tours = await Tour.find({_id: {$in: toursIds}})
+
+    res.status(200).render('overview', {
+      title: 'My Tours',
+      tours
+      
+    })
+    }
+    catch(err){
+      res.status(400).json({
+        status: 'fail',
+        message: err.message
+      })
+    }
+
+  }
+
+  exports.getMyReviews = async (req, res, next)=>{
+
+    try{
+    const reviews = await Review.find({user: req.user.id})
+
+    const toursIds=reviews.map(el =>el.tour);
+
+    const tours = await Tour.find({_id: {$in: toursIds}})
+
+    res.status(200).render('overview', {
+      title: 'My Reviewed Tours',
+      tours
+      
+    })
+    }
+    catch(err){
+      res.status(400).json({
+        status: 'fail',
+        message: err.message
+      })
+    }
+
   }
 
 
