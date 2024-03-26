@@ -1,13 +1,10 @@
 import '@babel/polyfill';
-import {login } from './login';
-import { displayMap } from './mapbox';
 import {updateData} from './updateSettings';
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 
 const bookBtn = document.getElementById('book-tour');
 import { bookTour } from './stripe';
-
 
 
 if (bookBtn){
