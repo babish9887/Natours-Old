@@ -7,8 +7,8 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-const DB = 'mongodb://localhost:27017/natours';
-// const DB="mongodb+srv://babish9887:zSv5TDnxbCLfK56x@cluster0.mzljvwc.mongodb.net/natours?retryWrites=true&w=majority&appName=Cluster0"
+// const DB = 'mongodb://localhost:27017/natours';
+const DB="mongodb+srv://babish9887:zSv5TDnxbCLfK56x@cluster0.mzljvwc.mongodb.net/natours?retryWrites=true&w=majority&appName=Cluster0"
 
 mongoose
   .connect(DB, {
