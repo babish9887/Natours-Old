@@ -1,6 +1,6 @@
 const Tour=require('../models/tourModel');
 const User=require('../models/userModel');
-const Booking= require('../models/bookingModel');
+const Booking= require('../models/bookingModel')
 const Review = require('../models/reviewModel')
 
 
@@ -47,6 +47,19 @@ exports.getOverview = async (req, res) => {
     try{
       res.status(200).render('login', {
         title: 'Login into your account'
+      })
+      } catch(e){
+        res.json({
+          status: 'Fail',
+          message: e.message
+        })    
+      }
+  }
+
+  exports.getSignupForm = async (req, res)=> {
+    try{
+      res.status(200).render('signup', {
+        title: 'Sign up your account'
       })
       } catch(e){
         res.json({
@@ -118,6 +131,7 @@ exports.getOverview = async (req, res) => {
   }
 
 
+
   exports.updateUserData =async (req, res)=> {
     try{
       const updatedUser = await User.findByIdAndUpdate(req.user.id, {
@@ -140,5 +154,34 @@ exports.getOverview = async (req, res) => {
       message: e.message
     })    
 
+    }
+  }
+
+
+  exports.getForgotPasswordForm=async(req, res)=> {
+    try{
+      res.status(200).render('forgotPassword', {
+        title: 'Forgot Password'
+      })
+      } catch(e){
+        res.json({
+          status: 'Fail',
+          message: e.message
+        })    
+      }
+  }
+
+
+  exports.getResetPasswordForm= async(req, res)=>{
+    try{
+      res.status(200).render('resetPassword', {
+        title: "Reset Password",
+        token:req.params.token
+      })
+    } catch(e){
+      res.json({
+        status: 'Fail',
+        message: e.message
+      })  
     }
   }

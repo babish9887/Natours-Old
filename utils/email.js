@@ -16,15 +16,14 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendEmail = async options => {
-//   const html = pug.renderFile(`${__dirname}/../views/email/${options.template}.pug`, {
-//     firstName: options.firstName,
-//     url: options.url,
-//     subject: options.subject,
-//   });
-//   const convertOptions = {
-//     wordwrap: 130,
-//     // ...
-//   };
+  const html = pug.renderFile(`${__dirname}/../views/email/${options.template}.pug`, {
+    firstName: options.firstName,
+    url: options.url,
+    subject: options.subject,
+  });
+  const convertOptions = {
+    wordwrap: 130,
+  };
 
     const mailOptions = {
         from: {
@@ -33,8 +32,8 @@ const sendEmail = async options => {
         },
         to:  [`${options.email}`],
         subject: options.subject,
-        // text: convert(html, convertOptions)
-        text: options.text
+        text: convert(html, convertOptions)
+        // text: options.text
     }
     try{
         await transporter.sendMail(mailOptions);

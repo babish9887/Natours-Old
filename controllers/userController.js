@@ -80,7 +80,7 @@ exports.updateMe = async (req, res) => {
 
   res.status(200).json({
     status: 'Success',
-    message: 'User data updated successfully',
+    message: 'User data updated successfully! Please refresh to see Changes!😊',
     data: {
       user: updatedUser
     }

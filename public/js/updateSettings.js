@@ -11,7 +11,7 @@ export const updateData=async (data, type)=>{
         });
 
         if(res.data.status == 'Success')
-            showAlert('success', `${type.toUpperCase()} updated Successfully`)
+            showAlert('success', `${type.toUpperCase()} updated Successfully! Please refresh to see Changes!`)
     } catch(e){
         showAlert('error', err.response.data.message)
     }

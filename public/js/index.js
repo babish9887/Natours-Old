@@ -11,7 +11,6 @@ import { bookTour } from './stripe';
 
 
 if (bookBtn){
-console.log('book tour present')
 bookBtn.addEventListener('click', e => {
     e.target.textContent = 'Processing...';
     const { tourId } = e.target.dataset;
@@ -27,7 +26,6 @@ if(userDataForm){
         form.append('email',document.getElementById('email').value);
 
         form.append('photo', document.getElementById('photo').files[0]);
-        console.log("The Form is", form)
         // const name=document.getElementById('name').value
         // const email=document.getElementById('email').value
         updateData(form, 'data')

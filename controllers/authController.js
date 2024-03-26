@@ -12,7 +12,7 @@ const signToken = id => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const  createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   const cookieOptions = {
     expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
@@ -41,7 +41,7 @@ exports.signup = async (req, res) => {
       passwordChangedAt: req.body.passwordChangedAt,
       role: req.body.role
     });
-    const url = 'http://localhost:3000/me';
+    const url = `${req.protocol}://${req.get('host')}/me`;
     // await new Email(newUser, url).sendWelcome()
     await sendEmail({
       firstName: newUser.name,
@@ -108,6 +108,9 @@ exports.protect = async (req, res, next) => {
     }
     
     if (!token) {
+      const currentUrl =  req.originalUrl;
+      if(currentUrl === '/me')
+        return res.status(401).redirect('/login')
       return res.status(401).json({ message: 'You are not logged in!' });
     }
 
@@ -191,30 +194,24 @@ exports.forgotPassword = async (req, res) => {
 
   const resetURL = `${req.protocol}://${req.get(
     'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
+  )}/resetPassword/${resetToken}`;
 
-  const message = `Forgot you password? submit a patch requirest with you new password to ${resetURL}`;
+  // const message = `Forgot you password? submit a patch requirest with you new password to ${resetURL}`;
 
   try {
-    // await sendEmail({
-    //   email: user.email,
-    //   subject: 'Your password reset Token',
-    //   message
-    // });
-    // console.log('after sending mail');
-    // await new Email(user, resetURL).sendPasswordReset();
+
     await sendEmail({
       firstName: user.name,
       url:resetURL,
       subject: "Reset Your password",
       email: user.email,
-      // template:'passwordReset'
-      text: message
+      template:'passwordReset',
+      // text: message
      })
 
 
     res.status(200).json({
-      status: 'success',
+      status: 'Success',
       message: 'Token sent to email',
       resetToken
     });
@@ -228,9 +225,9 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-exports.resetPassword = (req, res, next) => {
-  res.send('nothing');
-};
+// exports.resetPassword = (req, res, next) => {
+//   res.send('nothing');
+// };
 
 exports.resetPassword = async (req, res, next) => {
   // Get user based on the token
@@ -266,9 +263,7 @@ exports.resetPassword = async (req, res, next) => {
       message: err.message
     });
   }
-  // update changedPassword
 
-  //Log the user in
 };
 
 exports.updatePassword = async (req, res) => {
